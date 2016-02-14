@@ -3,13 +3,15 @@ extern crate clap;
 extern crate yaml_rust;
 
 mod error;
+mod project;
 
 use clap::{App, Arg};
-use error::Result;
 use std::fs::File;
 use std::io::prelude::*;
-use std::process::Command;
 use yaml_rust::{YamlLoader, Yaml};
+
+use error::Result;
+use project::Project;
 
 fn main() {
     let matches = App::new("mux")
@@ -29,12 +31,12 @@ fn main() {
         }
     };
 
-    let output = Command::new("tmux").output().unwrap();
-    println!("{:?}", output.status);
-    println!("{:?}", String::from_utf8(output.stderr));
-    println!("{:?}", output.stdout);
+    let project = Project::new(config);
+
     println!("{:?}", session_name);
-    println!("{:?}", config["name"].as_str().unwrap());
+    println!("{:?}", project.name);
+
+    project.launch();
 }
 
 fn load_config(session_name: &str) -> Result<Yaml> {
