@@ -8,7 +8,7 @@ pub struct Project {
 impl Project {
     pub fn new(config: Yaml) -> Project {
         Project {
-            name: "Mike".to_owned()
+            name: config["name"].as_str().unwrap().to_owned()
         }
     }
 
@@ -19,5 +19,23 @@ impl Project {
         println!("{:?}", output.status);
         println!("{:?}", String::from_utf8(output.stderr));
         println!("{:?}", output.stdout);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Project;
+    use yaml_rust::YamlLoader;
+
+    #[test]
+    fn test_new() {
+        let yaml =
+"
+name: rails
+";
+
+        let config = YamlLoader::load_from_str(yaml).unwrap()[0].to_owned();
+        let project = Project::new(config);
+        assert_eq!("rails", project.name);
     }
 }
