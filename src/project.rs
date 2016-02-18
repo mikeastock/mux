@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, Output};
 use yaml_rust::Yaml;
 
 pub struct Project {
@@ -13,12 +13,15 @@ impl Project {
     }
 
     pub fn launch(self) {
-        let child = Command::new("tmux").spawn().unwrap();
-        let output = child.wait_with_output().unwrap();
+        let commands = vec![*Command::new("tmux").arg("start-server")];
 
-        println!("{:?}", output.status);
-        println!("{:?}", String::from_utf8(output.stderr));
-        println!("{:?}", output.stdout);
+        let outputs: Vec<Output> = commands.into_iter().map(|command| command.output().unwrap()).collect();
+
+        for output in outputs {
+            println!("{:?}", output.status);
+            println!("{:?}", String::from_utf8(output.stderr));
+            println!("{:?}", output.stdout);
+        }
     }
 }
 
